@@ -271,11 +271,24 @@ class CenterHead(nn.Module):
             ret = {}
  
             # Regression loss for dimension, offset, height, rotation            
-            box_loss = self.crit_reg(preds_dict['anno_box'], example['mask'][task_id], example['ind'][task_id], target_box)
+            if(task_id == 1):
+                box_loss,ourLoss = self.crit_reg(preds_dict['anno_box'], example['mask'][task_id], example['ind'][task_id], target_box,True)
+            else: 
+                box_loss,ourLoss = self.crit_reg(preds_dict['anno_box'], example['mask'][task_id], example['ind'][task_id], target_box,False)
+          
 
             loc_loss = (box_loss*box_loss.new_tensor(self.code_weights)).sum()
 
+
+
             loss = hm_loss + self.weight*loc_loss
+            if(task_id==1):
+                weightCP = 0.3
+                weightGraph = 0.7
+                loss = loss * weightCP + ourLoss * weightGraph
+
+                
+                
 
             ret.update({'loss': loss, 'hm_loss': hm_loss.detach().cpu(), 'loc_loss':loc_loss, 'loc_loss_elem': box_loss.detach().cpu(), 'num_positive': example['mask'][task_id].float().sum()})
 

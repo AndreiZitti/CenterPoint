@@ -65,7 +65,7 @@ class NuScenesDataset(PointCloudDataset):
         if self.virtual:
             self._num_point_features = 16 
 
-        self.version = version
+        self.version = "v1.0-mini"
         self.eval_version = "detection_cvpr_2019"
 
     def reset(self):
